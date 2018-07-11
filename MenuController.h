@@ -3,10 +3,19 @@
 #include "Arduino.h"
 #include "Encoder.h"
 #include "Menu.h"
+#include "Feed.h"
 
 class MenuController {
 
+  private:
+
+    //Three feed per day will be supported.
+    Feed* _feed1;
+    Feed* _feed2;
+    Feed* _feed3;
+
   public:
+    MenuController(Feed* feeds[]);
     /**
        Select the correct [frame] of menu based on global variables [up] [down] [page] [menuItem]
 
@@ -28,6 +37,11 @@ class MenuController {
     void handleButtonPush(Encoder &encoder, Menu &menuObj);
     void handleButtonPushInMainMenu(Encoder &encoder, Menu &menuObj);
     void handleButtonPushInSubMenu(Encoder & encoder, Menu & menuObj);
+    void tongleFeedingStatus(int selectedFeed);
+    void setFeedingTime(int selectedFeed);
+    void setFeedingQuantity(int selectedFeed);
+    void goToMainMenu(Encoder &encoder, Menu &menuObj);
+
 
 
 };

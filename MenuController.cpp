@@ -1,7 +1,13 @@
 #include "Arduino.h"
 #include "MenuController.h"
 #include "Menu.h"
+#include "Feed.h"
 
+MenuController::MenuController(Feed* feeds[]) {
+  _feed1 = feeds[0];
+  _feed2 = feeds[1];
+  _feed3 = feeds[2];
+}
 /**
     Menu has: 3 items, 2 frames: [feed1 feed2][feed2 feed3]
     Sub-menu has: 4 items, 3 frames:[status time][time quantity][quantity back]
@@ -134,7 +140,7 @@ void MenuController::handleButtonPush(Encoder &encoder, Menu &menuObj) {
 }
 
 /**
-    Go to sub menu
+    In main menu when button is pushed we go to submenu
 */
 void MenuController::handleButtonPushInMainMenu(Encoder &encoder, Menu &menuObj) {
   encoder.setAccelerationEnabled(true);
@@ -144,20 +150,64 @@ void MenuController::handleButtonPushInMainMenu(Encoder &encoder, Menu &menuObj)
   menuObj.setSubMenuFrame(1);
 }
 
+/**
+   In sub menu when button is pushed we enter to the respective functionality
+*/
 void MenuController::handleButtonPushInSubMenu(Encoder &encoder, Menu &menuObj) {
   int menuItem = menuObj.getSubMenuItem();
+  int selectedFeed = menuObj.getMainMenuItem();
+
   switch (menuItem) {
     case 1: // Tongle Feed status
+      tongleFeedingStatus(selectedFeed);
       break;
     case 2: // Set Feed time
+      setFeedingTime(selectedFeed);
       break;
-    case 3: // Set Feed Quantity
+    case 3: // Set Feeding Quantity
+      setFeedingQuantity(selectedFeed);
       break;
     case 4: // Go to main menu
-      encoder.setAccelerationEnabled(false);
-      menuObj.setMenu(1);
+      goToMainMenu(encoder, menuObj);
       break;
   }
+}
+void MenuController::tongleFeedingStatus(int selectedFeed) {
+  switch (selectedFeed) {
+    case 1:// Feed1
+      _feed1->changeStatus();
+      break;
+    case 2: // Feed2
+      _feed2->changeStatus();
+      break;
+    case 3: // Feed3
+      _feed3->changeStatus();
+      break;
+  }
+}
+void MenuController::setFeedingTime(int selectedFeed) {
+  switch (selectedFeed) {
+    case 1:// Feed1
+      break;
+    case 2: // Feed2
+      break;
+    case 3: // Feed3
+      break;
+  }
+}
+void MenuController::setFeedingQuantity(int selectedFeed) {
+  switch (selectedFeed) {
+    case 1:// Feed1
+      break;
+    case 2: // Feed2
+      break;
+    case 3: // Feed3
+      break;
+  }
+}
+void MenuController::goToMainMenu(Encoder &encoder, Menu &menuObj) {
+  encoder.setAccelerationEnabled(false);
+  menuObj.setMenu(1);
 }
 
 

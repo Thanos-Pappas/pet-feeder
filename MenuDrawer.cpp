@@ -9,7 +9,10 @@
 
 
 
-MenuDrawer::MenuDrawer(LiquidCrystal_I2C* lcd) {
+MenuDrawer::MenuDrawer(LiquidCrystal_I2C* lcd, Feed* feeds[]) {
+  _feed1=feeds[0];
+  _feed2=feeds[1];
+  _feed3=feeds[2];
   _screen =  new MenuDisplay(lcd);
 }
 /**
@@ -18,12 +21,14 @@ MenuDrawer::MenuDrawer(LiquidCrystal_I2C* lcd) {
   Sub-menu has: 4 items, 3 frames:[status time][time quantity][quantity back]
 */
 void MenuDrawer::drawEntireMenu( Menu &menuObj ) {
-  // Main menu (PAGE 1)
-  if (menuObj.getMenu() == 1) {
-    drawMainMenu(menuObj);
-  } else {
-    // Sub-menu (PAGE 2)
-    drawSubMenu(menuObj);
+  switch (menuObj.getMenu()) {
+    case 1:
+      // Main menu (PAGE 1)
+      drawMainMenu(menuObj);
+      break;
+    case 2:
+      // Sub-menu (PAGE 2)
+      drawSubMenu(menuObj);
   }
 }
 /*
@@ -33,27 +38,16 @@ void MenuDrawer::drawMainMenu(Menu &menuObj) {
 
   int mainMenuItem = menuObj.getMainMenuItem();
   int frame = menuObj.getMainMenuFrame();
-
-  //Frame 1
-  if (mainMenuItem == 1 && frame == 1) {
-    _screen->displayMenuItem(MENU_ITEM_1, 0, true);
-    _screen->displayMenuItem(MENU_ITEM_2, 1, false);
-  }
-  else if (mainMenuItem == 2 && frame == 1) {
-    _screen->displayMenuItem(MENU_ITEM_1, 0, false);
-    _screen->displayMenuItem(MENU_ITEM_2, 1, true);
-  }
-  // Frame 2
-  else if (mainMenuItem == 2 && frame == 2) {
-    _screen->displayMenuItem(MENU_ITEM_2, 0, true);
-    _screen->displayMenuItem(MENU_ITEM_3, 1, false);
-  }
-  else if (mainMenuItem == 3 && frame == 2) {
-    _screen->displayMenuItem(MENU_ITEM_2, 0, false);
-    _screen->displayMenuItem(MENU_ITEM_3, 1, true);
+  switch (frame) {
+    case 1:
+      _screen->displayMenuItem(MENU_ITEM_1, 0, mainMenuItem == 1);
+      _screen->displayMenuItem(MENU_ITEM_2, 1, mainMenuItem == 2);
+      break;
+    case 2:
+      _screen->displayMenuItem(MENU_ITEM_2, 0, mainMenuItem == 2);
+      _screen->displayMenuItem(MENU_ITEM_3, 1, mainMenuItem == 3);
   }
 }
-
 
 void MenuDrawer::drawSubMenu(Menu &menuObj) {
 
@@ -62,38 +56,36 @@ void MenuDrawer::drawSubMenu(Menu &menuObj) {
 
   switch (mainMenuItem) {
     case 1:// comming from Feed1
-      drawSubMenuItem(subMenuItem, &_feed1);
+      drawSubMenuFrame(menuObj, _feed1);
       break;
     case 2: // comming from Feed2
-      drawSubMenuItem(subMenuItem, &_feed2);
+      drawSubMenuFrame(menuObj, _feed2);
       break;
     case 3: // comming from Feed3
-      drawSubMenuItem(subMenuItem, &_feed3);
+      drawSubMenuFrame(menuObj, _feed3);
       break;
   }
 }
-//TODO add [subframe] and "Quantity" and "Back"
-/*
-   Display the correct frame and the selected item of that frame
-*/
-void MenuDrawer::drawSubMenuItem(int subMenuItem, Feed *feed) {
+
+void MenuDrawer::drawSubMenuFrame(Menu &menuObj, Feed *feed) {
   String feedStatus = "OFF";
   if (feed->isActive()) {
     feedStatus = "ON";
   }
-  switch (subMenuItem) {
+  int subMenuItem = menuObj.getSubMenuItem();
+  int frame = menuObj.getSubMenuFrame();
+  switch (frame) {
     case 1:
-      _screen->displayMenuItems(feedStatus, feed->getFeedingTime(), 1);
+      _screen->displayMenuItem(feedStatus, 0, subMenuItem == 1);
+      _screen->displayMenuItem(feed->getFeedingTime(), 1, subMenuItem == 2);
       break;
     case 2:
-      _screen->displayMenuItems(feedStatus, feed->getFeedingTime(), 2);
+      _screen->displayMenuItem(feed->getFeedingTime(), 0, subMenuItem == 2);
+      _screen->displayMenuItem("Quantity " + String(feed->getQuantity()), 1, subMenuItem == 3);
       break;
     case 3:
-      _screen->displayMenuItems("Quantity "+String(feed->getQuantity()), "Back", 1);
-      break;
-    case 4:
-      _screen->displayMenuItems("Quantity "+String(feed->getQuantity()), "Back", 2);
-      break;
+      _screen->displayMenuItem("Quantity " + String(feed->getQuantity()), 0, subMenuItem == 3);
+      _screen->displayMenuItem("Back", 1, subMenuItem == 4);
   }
 }
 

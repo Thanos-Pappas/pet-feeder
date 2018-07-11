@@ -9,15 +9,14 @@ class MenuDrawer {
 
   private:
 
-    //TODO check if this staic Feed works
     //Three feed per day will be supported.
-    Feed _feed1;
-    Feed _feed2;
-    Feed _feed3;
+    Feed* _feed1;
+    Feed* _feed2;
+    Feed* _feed3;
     MenuDisplay* _screen;
 
   public:
-    MenuDrawer(LiquidCrystal_I2C* lcd);
+    MenuDrawer(LiquidCrystal_I2C* lcd, Feed* feeds[]);
     /**
       Draw menu and sub-menu
       Menu has: 3 items, 2 frames: [feed1 feed2][feed2 feed3]
@@ -29,17 +28,8 @@ class MenuDrawer {
       based on global variables [menuItem] [frame]
     */
     void drawMainMenu(Menu &menuObj);
-
-
     void drawSubMenu(Menu &menuObj);
-
-    //TODO add [subframe] and "feedQuantity" and "Back"
-    /**
-    Display the correct frame and the selected item of that frame,
-    based on global variables [subMenuItem]
-    */
-    void drawSubMenuItem(int subMenuItem, Feed *feed);
-
+    void drawSubMenuFrame(Menu &menuObj, Feed *feed);
 };
 
 #endif

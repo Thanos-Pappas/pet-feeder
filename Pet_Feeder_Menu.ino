@@ -1,22 +1,26 @@
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
+#include "Feed.h"
 #include <ClickEncoder.h>
 #include <TimerOne.h>
 #include "Encoder.h"
-#include "Feed.h"
 #include "MenuLevel.h"
 #include "Menu.h"
 #include "MenuDisplay.h"
 #include "MenuDrawer.h"
 #include "MenuController.h"
 
-
-
+Feed *feeds[3] = {
+  new Feed(),
+  new Feed(),
+  new Feed()
+};
 LiquidCrystal_I2C lcd(0x3F, 16, 2);
+
 Encoder encoder;
 Menu menu;
-MenuDrawer menuDrawer(&lcd);
-MenuController menuController;
+MenuDrawer menuDrawer(&lcd, feeds);
+MenuController menuController(feeds);
 
 //int lastSubMenuItem =1;
 
